@@ -1567,15 +1567,33 @@
   </script>
 
   <script>
-    async function loadAPOD(){
-      const container=document.getElementById("apod-container");
-      try{
-        const res=await fetch("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY");
-        const data=await res.json();
-        const isVideo=data.media_type==="video";
-        const mediaHTML=isVideo?`<iframe src="${data.url}" style="width:100%;aspect-ratio:16/9;border:none;border-radius:4px;" allowfullscreen></iframe>`:`<img src="${data.hdurl||data.url}" alt="${data.title}" style="width:100%;border-radius:4px;display:block;max-height:600px;object-fit:cover;" />`;
-        container.innerHTML=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;">${mediaHTML}<div style="padding:1.5rem 2rem 2rem;"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;"><h3 style="font-size:1.1rem;font-weight:500;color:var(--text);">${data.title}</h3><span style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);background:var(--surface2);padding:4px 10px;border-radius:3px;white-space:nowrap;">${data.date}</span></div><p style="font-size:0.85rem;color:var(--dim);line-height:1.7;margin-bottom:1rem;">${data.explanation}</p>${data.copyright?`<p style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--dim);letter-spacing:0.08em;">&#169; ${data.copyright.trim()}</p>`:'<p style="font-family:\'DM Mono\',monospace;font-size:0.58rem;color:var(--dim);letter-spacing:0.08em;">PUBLIC DOMAIN &nbsp;&middot;&nbsp; NASA</p>'}</div></div>`;
-      }catch(e){container.innerHTML='<div style="text-align:center;font-family:\'DM Mono\',monospace;font-size:0.7rem;color:#e07070;padding:3rem 0;">COULD NOT LOAD NASA DATA</div>';}
+    async function loadAPOD() {
+      const container = document.getElementById("apod-container");
+      try {
+        const res = await fetch("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY");
+        const data = await res.json();
+        const isVideo = data.media_type === "video";
+        const mediaHTML = isVideo
+          ? `<iframe src="${data.url}" style="width:100%;aspect-ratio:16/9;border:none;border-radius:4px;" allowfullscreen></iframe>`
+          : `<img src="${data.hdurl || data.url}" alt="${data.title}" style="width:100%;border-radius:4px;display:block;max-height:600px;object-fit:cover;" />`;
+        const credit = data.copyright
+          ? `<p style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--dim);letter-spacing:0.08em;">&#169; ${data.copyright.trim()}</p>`
+          : `<p style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--dim);letter-spacing:0.08em;">PUBLIC DOMAIN &nbsp;&middot;&nbsp; NASA</p>`;
+        container.innerHTML = `
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;">
+            ${mediaHTML}
+            <div style="padding:1.5rem 2rem 2rem;">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+                <h3 style="font-size:1.1rem;font-weight:500;color:var(--text);">${data.title}</h3>
+                <span style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);background:var(--surface2);padding:4px 10px;border-radius:3px;white-space:nowrap;">${data.date}</span>
+              </div>
+              <p style="font-size:0.85rem;color:var(--dim);line-height:1.7;margin-bottom:1rem;">${data.explanation}</p>
+              ${credit}
+            </div>
+          </div>`;
+      } catch(e) {
+        container.innerHTML = '<div style="text-align:center;font-family:\'DM Mono\',monospace;font-size:0.7rem;color:#e07070;padding:3rem 0;">COULD NOT LOAD NASA DATA</div>';
+      }
     }
     loadAPOD();
   </script>
