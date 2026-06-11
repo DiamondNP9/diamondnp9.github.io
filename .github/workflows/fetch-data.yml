@@ -1,0 +1,46 @@
+name: Fetch API Data
+
+on:
+  schedule:
+    - cron: '*/15 13-21 * * 1-5'
+    - cron: '0 6 * * *'
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Fetch market data
+        run: |
+          mkdir -p data
+          curl -s "https://finnhub.io/api/v1/quote?symbol=SPY&token=${{ secrets.FINNHUB_KEY }}" > data/SPY.json
+          curl -s "https://finnhub.io/api/v1/quote?symbol=QQQ&token=${{ secrets.FINNHUB_KEY }}" > data/QQQ.json
+          curl -s "https://finnhub.io/api/v1/quote?symbol=DIA&token=${{ secrets.FINNHUB_KEY }}" > data/DIA.json
+          curl -s "https://finnhub.io/api/v1/quote?symbol=AAPL&token=${{ secrets.FINNHUB_KEY }}" > data/AAPL.json
+          curl -s "https://finnhub.io/api/v1/quote?symbol=MSFT&token=${{ secrets.FINNHUB_KEY }}" > data/MSFT.json
+          curl -s "https://finnhub.io/api/v1/quote?symbol=GOOGL&token=${{ secrets.FINNHUB_KEY }}" > data/GOOGL.json
+          curl -s "https://finnhub.io/api/v1/quote?symbol=AMZN&token=${{ secrets.FINNHUB_KEY }}" > data/AMZN.json
+          curl -s "https://finnhub.io/api/v1/quote?symbol=NVDA&token=${{ secrets.FINNHUB_KEY }}" > data/NVDA.json
+
+      - name: Fetch NASA APOD
+        run: |
+          curl -s "https://api.nasa.gov/planetary/apod?api_key=${{ secrets.NASA_KEY }}" > data/apod.json
+
+      - name: Fetch World Bank availability
+        run: |
+          curl -s "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.CD?format=json&mrv=1&per_page=300" > data/wb_availability.json
+
+      - name: Commit and push data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --staged --quiet || git commit -m "Update cached API data"
+          git push
